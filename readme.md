@@ -49,3 +49,7 @@ If you don't have the URL for the boilerplate repository, you can download the c
 ```
 pip install -r requirements.txt
 ```
+(TAKE HOME)
+1. Create Virtual ENV
+2. Clone Repository
+3. Download Requirements
