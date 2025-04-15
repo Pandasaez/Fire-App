@@ -22,3 +22,18 @@ def map_station(request):
     }  
 
     return render(request, 'map_station.html', context)  
+
+def map_incident(request):
+    incidents = Locations.objects.values('name', 'latitude', 'longitude')
+
+    for fs in incidents:
+        fs['latitude'] = float(fs['latitude'])
+        fs['longitude'] = float(fs['longitude'])
+
+    incident_list = list(incidents)
+
+    context = {
+        'incident': incident_list,
+    }
+
+    return render(request, 'map_incidents.html', context)
