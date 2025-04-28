@@ -1,0 +1,231 @@
+{% extends 'base.html' %} {% load static %} {% block content %}
+<div class="page-inner">
+  <h4 class="page-title">Charts Dashboard</h4>
+  <div class="row">
+
+    <!-- Line Chart -->
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header"><div class="card-title">Line Chart</div></div>
+        <div class="card-body"><canvas id="lineChart"></canvas></div>
+      </div>
+    </div>
+
+    <!-- Pie Chart -->
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header"><div class="card-title">Pie Chart</div></div>
+        <div class="card-body"><canvas id="pieChart"></canvas></div>
+      </div>
+    </div>
+
+    <!-- Multiple Line Chart -->
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header"><div class="card-title">Multiple Line Chart</div></div>
+        <div class="card-body"><canvas id="multipleLineChart"></canvas></div>
+      </div>
+    </div>
+
+    <!-- Multiple Bar Chart -->
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header"><div class="card-title">Multiple Bar Chart</div></div>
+        <div class="card-body"><canvas id="multipleBarChart"></canvas></div>
+      </div>
+    </div>
+
+    <!-- Polar Area Chart -->
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header"><div class="card-title">Polar Area Chart</div></div>
+        <div class="card-body"><canvas id="polarAreaChart"></canvas></div>
+      </div>
+    </div>
+
+    <!-- Scatter Chart -->
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header"><div class="card-title">Scatter Chart</div></div>
+        <div class="card-body"><canvas id="scatterChart"></canvas></div>
+      </div>
+    </div>
+
+    <!-- Area Chart -->
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header"><div class="card-title">Area Chart</div></div>
+        <div class="card-body"><canvas id="areaChart"></canvas></div>
+      </div>
+    </div>
+
+    <!-- Stacked Bar Chart -->
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header"><div class="card-title">Stacked Bar Chart</div></div>
+        <div class="card-body"><canvas id="stackedBarChart"></canvas></div>
+      </div>
+    </div>
+
+    <!-- Mixed Chart -->
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-header"><div class="card-title">Mixed Chart (Line + Bar)</div></div>
+        <div class="card-body"><canvas id="mixedChart"></canvas></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block chart %}
+<script>
+function loadChartData() {
+  // Existing Line Chart
+  fetch("/lineChart/")
+    .then((response) => response.json())
+    .then((data) => {
+      new Chart(document.getElementById("lineChart"), {
+        type: "line",
+        data: {
+          labels: Object.keys(data),
+          datasets: [{
+            label: "Incidents per Month",
+            data: Object.values(data),
+            backgroundColor: "rgba(29, 122, 243, 0.3)",
+            borderColor: "#1d7af3",
+            fill: true
+          }]
+        }
+      });
+    });
+
+  // Pie Chart
+  fetch("/chart/")
+    .then((response) => response.json())
+    .then((data) => {
+      new Chart(document.getElementById("pieChart"), {
+        type: "pie",
+        data: {
+          labels: Object.keys(data),
+          datasets: [{
+            data: Object.values(data),
+            backgroundColor: ["#1d7af3", "#f3545d", "#fdaf4b"]
+          }]
+        }
+      });
+    });
+
+  // Multiple Line Chart
+  fetch("/multilineChart/")
+    .then((response) => response.json())
+    .then((data) => {
+      var datasets = [];
+      Object.keys(data).forEach((country, i) => {
+        datasets.push({
+          label: country,
+          data: Object.values(data[country]),
+          borderColor: ["#1d7af3", "#59d05d", "#f3545d"][i],
+          fill: false
+        });
+      });
+      new Chart(document.getElementById("multipleLineChart"), {
+        type: "line",
+        data: {
+          labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+          datasets: datasets
+        }
+      });
+    });
+
+  // Multiple Bar Chart
+  fetch("/multiBarChart/")
+    .then((response) => response.json())
+    .then((data) => {
+      var datasets = [];
+      Object.keys(data).forEach((severity, i) => {
+        datasets.push({
+          label: severity,
+          data: Object.values(data[severity]),
+          backgroundColor: ["#177dff", "#fdaf4b", "#59d05d"][i]
+        });
+      });
+      new Chart(document.getElementById("multipleBarChart"), {
+        type: "bar",
+        data: {
+          labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+          datasets: datasets
+        },
+        options: { scales: { x: { stacked: true }, y: { stacked: true } } }
+      });
+    });
+
+  // Polar Area Chart (dummy data)
+  new Chart(document.getElementById("polarAreaChart"), {
+    type: "polarArea",
+    data: {
+      labels: ["Minor", "Moderate", "Major"],
+      datasets: [{
+        data: [10, 20, 30],
+        backgroundColor: ["#1d7af3", "#59d05d", "#f3545d"]
+      }]
+    }
+  });
+
+  // Scatter Chart (dummy data)
+  new Chart(document.getElementById("scatterChart"), {
+    type: "scatter",
+    data: {
+      datasets: [{
+        label: "Scatter Dataset",
+        data: [{x: 10, y: 20}, {x: 20, y: 10}, {x: 30, y: 40}],
+        backgroundColor: "#fdaf4b"
+      }]
+    }
+  });
+
+  // Area Chart (dummy data)
+  new Chart(document.getElementById("areaChart"), {
+    type: "line",
+    data: {
+      labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+      datasets: [{
+        label: "Area Dataset",
+        data: [30, 20, 50, 40, 60, 70],
+        backgroundColor: "rgba(29, 122, 243, 0.4)",
+        borderColor: "#1d7af3",
+        fill: true
+      }]
+    }
+  });
+
+  // Stacked Bar Chart (dummy data)
+  new Chart(document.getElementById("stackedBarChart"), {
+    type: "bar",
+    data: {
+      labels: ["Q1", "Q2", "Q3", "Q4"],
+      datasets: [
+        {label: "A", data: [10, 20, 30, 40], backgroundColor: "#1d7af3"},
+        {label: "B", data: [20, 30, 10, 50], backgroundColor: "#59d05d"}
+      ]
+    },
+    options: { scales: { x: { stacked: true }, y: { stacked: true } } }
+  });
+
+  // Mixed Chart (dummy data)
+  new Chart(document.getElementById("mixedChart"), {
+    type: "bar",
+    data: {
+      labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+      datasets: [
+        {label: "Bar Dataset", data: [10, 20, 30, 40, 50, 60], backgroundColor: "#fdaf4b"},
+        {label: "Line Dataset", data: [60, 50, 40, 30, 20, 10], type: "line", borderColor: "#1d7af3", backgroundColor: "transparent"}
+      ]
+    }
+  });
+}
+
+loadChartData();
+</script>
+{% endblock %}
