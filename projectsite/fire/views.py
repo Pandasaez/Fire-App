@@ -1,11 +1,15 @@
 from django.shortcuts import render
 from django.views.generic.list import ListView
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from fire.models import Locations, Incident, FireStation
+from fire.forms import FireStationForm, FireFighterForm, FireTruckForm, LocationForm, WeatherConditionForm, IncidentForm
 from django.db import connection
 from django.http import JsonResponse
 from django.db.models.functions import ExtractMonth
+from django.urls import reverse_lazy
 from django.db.models import Count
 from datetime import datetime
+from django.contrib import messages
 
 class HomePageView(ListView):
     model = Locations
@@ -170,3 +174,50 @@ def map_incident(request):
     }
 
     return render(request, 'map_incidents.html', context)
+
+class FireStationList(ListView):
+    model = FireStation
+    content_object_name = 'fireStation'
+    template_name = 'fireStation_list.html'
+    paginate_by = 5
+
+    def get_queryset(self, *args, **kwargs):
+        qs = super(FireStationList, self).get_queryset(*args, **kwargs)
+        if self.request.GET.get("q") != None:
+            query = self.request.GET.get('q')
+            qs = qs.filter(Q(name__icontains=query))
+        return qs
+
+class FireStationCreateView(CreateView):
+    model = FireStation
+    form_class = FireStationForm
+    template_name = 'firestation_add.html'
+    success_url = reverse_lazy('fireStation-list')
+
+    def form_valid(self, form):
+        name_fireStation = form.instance.name
+        messages.success(self.request, f"{name_fireStation} has been added successfully.")
+        return super().form_valid(form)
+
+class FireStationUpdateView(UpdateView):
+    model = FireStation
+    fields = "__all__"
+    context_object_name = "fireStation"
+    template_name = 'firestation_edit.html'
+    success_url = reverse_lazy('fireStation-list')
+
+    def form_valid(self, form):
+        fireStation_name = form.instance.name
+        messages.success(self.request,f'{fireStation_name} has been Updated.')
+
+        return super().form_valid(form)
+
+class FireStationDeleteView(DeleteView):
+    model = FireStation
+    #form_class = CollegeForm
+    template_name = 'firestation_del.html'
+    success_url = reverse_lazy('fireStation-list')
+
+    def form_valid(self, form):
+        messages.success(self.request, f"Fire Station Deleted successfully.")
+        return super().form_valid(form)
