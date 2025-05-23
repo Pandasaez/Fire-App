@@ -7,7 +7,7 @@ from django.db import connection
 from django.http import JsonResponse
 from django.db.models.functions import ExtractMonth
 from django.urls import reverse_lazy
-from django.db.models import Count
+from django.db.models import Count, Q
 from datetime import datetime
 from django.contrib import messages
 
